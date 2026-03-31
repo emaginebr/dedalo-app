@@ -1,0 +1,55 @@
+flowchart TD
+    subgraph Client["🌐 Browser"]
+        SPA["Dedalo App\n(React 19 SPA)"]
+    end
+
+    subgraph Resolution["Resolução de Website"]
+        CD["Domínio Customizado\nexemplo.com"]
+        SD["Subdomínio\nslug.emagine.com.br"]
+        FP["Pasta/Folder\nemagine.com.br/slug"]
+    end
+
+    subgraph Nginx["Nginx Reverse Proxy"]
+        NX["Roteamento SPA\n+ Proxy API"]
+    end
+
+    subgraph Backend["Dedalo API (.NET)"]
+        API["REST API\nBearer + X-Tenant-Id"]
+        WS["Website Service"]
+        PS["Page Service"]
+        CS["Content Service"]
+        MS["Menu Service"]
+        IS["Image Service"]
+    end
+
+    subgraph Auth["NAuth"]
+        NA["NAuth API\nAutenticação JWT"]
+    end
+
+    subgraph DB["Banco de Dados"]
+        SQL[(SQL Server)]
+    end
+
+    CD --> NX
+    SD --> NX
+    FP --> NX
+
+    NX -->|"Static Assets"| SPA
+    NX -->|"/api/*"| API
+
+    SPA -->|"GET /website/domain/{host}\nGET /website/slug/{slug}"| WS
+    SPA -->|"CRUD Pages"| PS
+    SPA -->|"CRUD Content"| CS
+    SPA -->|"CRUD Menus"| MS
+    SPA -->|"Upload/Manage"| IS
+    SPA -->|"Login/Register"| NA
+
+    API --> SQL
+    NA --> SQL
+
+    style Client fill:#e0f2fe,stroke:#0284c7
+    style Resolution fill:#fef3c7,stroke:#d97706
+    style Nginx fill:#d1fae5,stroke:#059669
+    style Backend fill:#ede9fe,stroke:#7c3aed
+    style Auth fill:#fce7f3,stroke:#db2777
+    style DB fill:#fee2e2,stroke:#dc2626
