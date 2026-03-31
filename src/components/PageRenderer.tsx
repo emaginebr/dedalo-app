@@ -10,11 +10,12 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { useWebsite, usePage, useContent } from '../hooks';
+import { useWebsite, usePage, useContent, useEditMode } from '../hooks';
 import { getTemplate } from '../templates';
 import { ContentArea } from './editor/ContentArea';
 import { ComponentPicker } from './editor/ComponentPicker';
 import { ContentEditor } from './editor/ContentEditor';
+import { PageEditModal } from './editor/PageEditModal';
 import { Modal } from './ui/Modal';
 import { getContentComponent } from './content';
 import { ContentService } from '../services';
@@ -55,6 +56,8 @@ export function PageRenderer() {
   const [pickerArea, setPickerArea] = useState('');
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<ContentInfo | null>(null);
+  const [pageEditOpen, setPageEditOpen] = useState(false);
+  const { isEditMode } = useEditMode();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -76,9 +79,10 @@ export function PageRenderer() {
   const template = website ? getTemplate(website.templateSlug) : undefined;
   const Layout = template?.Layout;
 
+  const templatePageSlug = currentPage?.templatePageSlug || 'main-page';
   const templatePageDef = template?.pages.find(
-    p => p.slug === currentPage?.templatePageSlug
-  ) || template?.pages[0];
+    p => p.slug === templatePageSlug
+  ) || template?.pages.find(p => p.slug === 'main-page') || template?.pages[0];
 
   const areas = templatePageDef?.areas || [
     { slug: 'main-content', label: 'Conteudo Principal' },
@@ -276,6 +280,28 @@ export function PageRenderer() {
           templateSlug={website.templateSlug}
           onSave={handleSaveContent}
         />
+      )}
+
+      {isEditMode && currentPage && (
+        <>
+          <button
+            onClick={() => setPageEditOpen(true)}
+            title="Editar Pagina"
+            className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition flex items-center justify-center"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </button>
+
+          <PageEditModal
+            isOpen={pageEditOpen}
+            onClose={() => setPageEditOpen(false)}
+            page={currentPage}
+            websiteId={website.websiteId}
+            templateSlug={website.templateSlug}
+          />
+        </>
       )}
     </DndContext>
   );

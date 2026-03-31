@@ -1,6 +1,7 @@
 import type { MenuInfo } from '../../types';
 import { LinkTypeEnum } from '../../types';
 import { useNavigate } from 'react-router-dom';
+import { usePage } from '../../hooks';
 
 interface NavigationProps {
   menus: MenuInfo[];
@@ -9,6 +10,7 @@ interface NavigationProps {
 
 export function Navigation({ menus, websiteSlug }: NavigationProps) {
   const navigate = useNavigate();
+  const { pages } = usePage();
   const rootMenus = menus.filter(m => m.parentId === null);
 
   const getChildren = (parentId: number) => menus.filter(m => m.parentId === parentId);
@@ -17,8 +19,11 @@ export function Navigation({ menus, websiteSlug }: NavigationProps) {
     if (menu.linkType === LinkTypeEnum.External && menu.externalLink) {
       window.open(menu.externalLink, '_blank');
     } else if (menu.linkType === LinkTypeEnum.InternalPage && menu.pageId) {
-      const page = menus.find(m => m.menuId === menu.menuId);
-      navigate(page ? `/${websiteSlug || ''}` : '/');
+      const page = pages.find(p => p.pageId === menu.pageId);
+      if (page) {
+        const base = websiteSlug ? `/${websiteSlug}` : '';
+        navigate(`${base}/${page.pageSlug}`);
+      }
     }
   };
 

@@ -12,7 +12,6 @@ export interface PageInfo {
 
 export interface PageInsertInfo {
   websiteId: number;
-  pageSlug: string;
   templatePageSlug: string;
   name: string;
 }

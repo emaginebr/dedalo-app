@@ -21,8 +21,6 @@ export function MenuItemModal({ isOpen, onClose, websiteId, parentId, editingMen
   const [externalLink, setExternalLink] = useState('');
   const [pageId, setPageId] = useState<number | null>(null);
   const [createNewPage, setCreateNewPage] = useState(false);
-  const [newPageName, setNewPageName] = useState('');
-  const [newPageSlug, setNewPageSlug] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -38,8 +36,6 @@ export function MenuItemModal({ isOpen, onClose, websiteId, parentId, editingMen
       setExternalLink('');
       setPageId(null);
       setCreateNewPage(false);
-      setNewPageName('');
-      setNewPageSlug('');
     }
   }, [editingMenu, isOpen]);
 
@@ -49,12 +45,10 @@ export function MenuItemModal({ isOpen, onClose, websiteId, parentId, editingMen
     try {
       let finalPageId = pageId;
 
-      if (linkType === LinkTypeEnum.InternalPage && createNewPage && newPageName) {
-        const slug = newPageSlug || newPageName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      if (linkType === LinkTypeEnum.InternalPage && createNewPage && name) {
         const newPage = await PageService.create(websiteId, {
-          pageSlug: slug,
-          templatePageSlug: 'home',
-          name: newPageName,
+          templatePageSlug: 'main-page',
+          name,
         });
         finalPageId = newPage.pageId;
         addPage(newPage);
@@ -120,7 +114,7 @@ export function MenuItemModal({ isOpen, onClose, websiteId, parentId, editingMen
               </label>
             </div>
 
-            {!createNewPage ? (
+            {!createNewPage && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Selecionar Pagina</label>
                 <select value={pageId || ''} onChange={e => setPageId(Number(e.target.value) || null)} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -129,17 +123,6 @@ export function MenuItemModal({ isOpen, onClose, websiteId, parentId, editingMen
                     <option key={p.pageId} value={p.pageId}>{p.name}</option>
                   ))}
                 </select>
-              </div>
-            ) : (
-              <div className="space-y-3 pl-4 border-l-2 border-blue-200">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Pagina</label>
-                  <input type="text" value={newPageName} onChange={e => { setNewPageName(e.target.value); setNewPageSlug(e.target.value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')); }} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-                  <input type="text" value={newPageSlug} onChange={e => setNewPageSlug(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-                </div>
               </div>
             )}
           </div>

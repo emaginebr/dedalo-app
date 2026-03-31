@@ -8,7 +8,7 @@ function getAuthToken(): string | null {
     const session = JSON.parse(stored);
     return session.token || null;
   } catch {
-    return null;
+    return stored;
   }
 }
 
@@ -35,7 +35,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (response.status === 204) return undefined as T;
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(error || `HTTP ${response.status}`);
+    throw new Error(error ? `HTTP ${response.status}: ${error}` : `HTTP ${response.status}`);
   }
 
   const text = await response.text();

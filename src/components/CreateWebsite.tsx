@@ -26,7 +26,7 @@ export function CreateWebsite() {
           <p className="text-gray-500 mb-6">Voce precisa estar logado para criar um website.</p>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('open-auth-panel', { detail: 'login' }))}
-            className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Entrar
           </button>
@@ -121,7 +121,7 @@ export function CreateWebsite() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
+            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
             {saving ? 'Criando...' : 'Criar Website'}
           </button>
